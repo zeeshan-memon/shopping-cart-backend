@@ -1,0 +1,35 @@
+{
+  "name": "zamshopbackend",
+  "version": "1.0.0",
+  "description": "This is Ecommerce project for practice.",
+  "main": "app.js",
+  "scripts": {
+    "local": "cross-env NODE_ENV=local nodemon app.js",
+    "dev": "cross-env NODE_ENV=dev pm2 start app.js --name 'ZamShop'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zeeshan-memon/zamshopbackend.git"
+  },
+  "author": "Zeeshan Ahmed",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zeeshan-memon/zamshopbackend/issues"
+  },
+  "homepage": "https://github.com/zeeshan-memon/zamshopbackend#readme",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.1",
+    "method-override": "^3.0.0",
+    "mongoose": "^6.6.5",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^2.0.20"
+  }
+}
