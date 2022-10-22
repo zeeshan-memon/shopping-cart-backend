@@ -10,6 +10,32 @@ require("./routes/index")(router);
 app.get("/working", (req, res) => {
   return res.status(200).send("Working!!");
 });
+const {createClient} = require('redis')
+const { createAdapter } = require("@socket.io/redis-adapter");
+
+server.listen(process.env.PORT, () =>
+  console.log(`Server is running on ${process.env.PORT}`)
+);
+const client = createClient({
+  url: `redis://:${process.env.REDIS_AUTH}@${process.env.REDISHOST}:${process.env.REDISPORT}`,
+});
+require('./config/redis').initRedis(client)
+//=========== Socket
+const io = require("socket.io")(server, {
+  pingInterval: 6000,
+  pingTimeout: 3000,
+  cookie: false,
+  origins: "*:*"
+});
+
+const subClient = client.duplicate();    
+require("./config/socket").init(io);
+subClient.connect().then(() => {
+  io.adapter(createAdapter(client, subClient));
+});
+subClient.on("error", (err) => {
+  console.log("subClient", err);
+})
 
 server.listen(process.env.PORT, () =>
   console.log(`Server is running on ${process.env.PORT}`)

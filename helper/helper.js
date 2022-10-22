@@ -1,4 +1,9 @@
 const cryptoJS = require("crypto-js");
+const nodemailer = require("nodemailer");
+const mongoose = require('mongoose');
+const axios = require('axios');
+const moment = require('moment');
+const roundTo = require('round-to');
 
 exports.errorMessage = (error) => {
   console.log(
@@ -118,3 +123,183 @@ const errorMessage = (e) => {
     return e;
   }
 };
+
+/**
+ * ===================================================================================================================
+ * General Method for getting mail configuration.
+ * ===================================================================================================================
+ */
+
+let mailConfig = {
+  name: "mail.zambazaar.com",
+  host: process.env.SMTP,
+  port: process.env.EMAILPORT,
+  secure: true,
+  auth: {
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD,
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+};
+
+/**
+ * ===================================================================================================================
+ * General Method for sending email through node mailer.
+ * ===================================================================================================================
+ */
+
+exports.sendEmail = (obj) => {
+  return new Promise((resolve, reject) => {
+    try {
+      let mail = nodemailer.createTransport(mailConfig);
+      mail.sendMail(
+        {
+          from: `'Zambazaar'<${process.env.EMAIL}>`,
+          to: obj.Recipients,
+          subject: obj.Subject,
+          html: obj.message,
+          cc: obj.CC,
+        },
+        (err, info) => {
+          return err ? reject(err) : resolve(info);
+        }
+      );
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+/**
+ * ===================================================================================================================
+ * General Method to convert string to mongoose Object
+ * ===================================================================================================================
+ */
+
+exports.toMongooseObjectId = (e) => {
+  return mongoose.Types.ObjectId(e);
+};
+
+/**
+ * ===================================================================================================================
+ * General Method to get the response from the axios
+ * ===================================================================================================================
+ */
+
+ exports.axios = (url, req, httpMethod, serviceName, data) => {
+  const options = {
+    method: httpMethod,
+    headers: {
+      'content-type': 'application/json',
+      authorization: req.headers['authorization'],
+    },
+    url,
+  };
+
+  if (data) {
+    options.data = (boolean(process.env.ENCRYPTION)) ? {
+      d: encodeObject(data)
+    } : data
+  }
+
+  return new Promise((resolve, reject) => {
+    axios(options)
+      .then(function (response) {
+        // console.log("response.data.d", response.data.d)
+
+        if (boolean(process.env.ENCRYPTION))
+          response = decodeObject(response.data.d);
+        else
+          response = response.data
+
+        // console.log("response", response)
+
+        if (response.status) {
+          resolve(response.response);
+        } else {
+          reject(`Encountered an error from ${serviceName} : ${response.error}`)
+        }
+      })
+      .catch(function (error) {
+        error.message = `${serviceName} unable to establish the connection: ${error}`
+        reject(error);
+      });
+  });
+};
+
+/**
+ * ===================================================================================================================
+ * Method to get the start time of the date
+ * ===================================================================================================================
+ */
+
+ exports.startTimeOfDate = (time, date) => {
+  if (date) {
+    return moment(new Date(date)).startOf(time).toDate();
+  } else {
+    return moment().startOf(time).toDate();
+  }
+};
+
+/**
+ * ===================================================================================================================
+ * Method to get the end time of the date
+ * ===================================================================================================================
+ */
+
+ exports.endTimeOfDate = (time, date) => {
+  if (date) {
+    return moment(new Date(date)).endOf(time).toDate();
+  } else {
+    return moment().endOf(time).toDate();
+  }
+};
+
+/**
+ * ===================================================================================================================
+ * General Method for round off the decimal value.
+ * ===================================================================================================================
+ */
+
+ exports.round = (value) => {
+  value = parseFloat(value);
+  value = roundTo(value, 4).toFixed(4)
+  return parseFloat(value);
+}
+
+/**
+ * ===================================================================================================================
+ * General Method for round off the decimal value.
+ * ===================================================================================================================
+ */
+
+exports.roundWithTwoDecimal = (value) => {
+  value = parseFloat(value);
+  value = roundTo(value, 4)
+  return value.toFixed(2);
+}
+
+/**
+ * ===================================================================================================================
+ * General Method for fix the decimal value.
+ * ===================================================================================================================
+ */
+
+exports.fix = (value) => {
+  value = parseFloat(value).toFixed(4)
+  return value;
+}
+
+/**
+ * ===================================================================================================================
+ * General Method to remove milliseconds from time object.
+ * ===================================================================================================================
+ */
+
+exports.removeMilliseconds = (dt) => {
+  let date = new Date(dt)
+  date.setMilliseconds('000')
+  return date;
+}

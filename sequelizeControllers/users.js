@@ -1,9 +1,11 @@
 const helper = require("../helper/helper");
-const repository = require("../helper/repository");
+const repository = require("../helper/seq-repository");
 const templates = require("../helper/templates");
-const userModel = require("../models/user");
+const userModel = require("../sequelizeModels/uers");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
+let transaction = null;
+const sequelize = require("../configs/sequelize");
 
 module.exports = {
   /**
@@ -61,7 +63,8 @@ const fnCreateUser = async (req, res) => {
     const user = new userModel();
     const new_password = body.password;
     body.password = user.generateHash(new_password);
-    const data = await repository.register(userModel, body);
+    transaction = await sequelize.transaction();
+    const data = await repository.save(userModel, body, transaction, false);
     const obj = {
       _id: data._id,
       name: data.userName,
@@ -85,10 +88,12 @@ const fnCreateUser = async (req, res) => {
           ),
         };
         await helper.sendEmail(message);
+        await transaction.commit();
         return res.status(200).json(helper.SuccessMessage(data));
       }
     );
   } catch (error) {
+    await transaction.rollback();
     return res.status(200).json(helper.errorMessage(error));
   }
 };
@@ -109,12 +114,14 @@ const fnGetUser = async (req, res) => {
       userModel,
       query,
       isSingle,
-      "-__v -password ",
-      "-createdAt",
       null,
       null,
       null,
-      true
+      null,
+      null,
+      null,
+      null,
+      false
     );
 
     return res.status(200).json(helper.statusMessages(data));
@@ -136,18 +143,19 @@ const fnUpdateUser = async (req, res) => {
       let query = {
         _id: req.params.id,
       };
-      let updateReason = body.reason ? body.reason : "";
 
       const user = await repository.get(
         userModel,
         query,
         true,
-        "isAdmin email userName",
         null,
         null,
         null,
         null,
-        true
+        null,
+        null,
+        null,
+        false
       );
 
       if (!user) {
@@ -155,10 +163,10 @@ const fnUpdateUser = async (req, res) => {
           .status(200)
           .json(helper.errorMessage(helper.statusMessages.account_not_found));
       }
-
+      transaction = await sequelize.transaction();
       //Update
-      const data = await repository.update(userModel, query, body);
-
+      const data = await repository.update(userModel, query, body, transaction);
+      await transaction.commit();
       return res.status(200).json(helper.SuccessMessage(data));
     } else {
       return res
@@ -166,6 +174,7 @@ const fnUpdateUser = async (req, res) => {
         .json(helper.errorMessage(helper.statusMessages.parameter_Missing));
     }
   } catch (error) {
+    await transaction.rollback();
     return res.status(200).json(helper.errorMessage(error));
   }
 };
@@ -179,35 +188,39 @@ const fnDeleteUser = async (req, res) => {
       let query = {
         _id: req.params.id,
       };
-      let user = await repository.count(
+      let user = await repository.get(
         userModel,
         query,
         true,
-        "_id userName",
         null,
         null,
         null,
         null,
-        true
+        null,
+        null,
+        null,
+        false
       );
 
       if (!user) {
-        return res.status(200).json(helper.errorMessage("UserX Not Found"));
+        return res.status(200).json(helper.errorMessage("User Not Found"));
       }
-
+      transaction = await sequelize.transaction();
       let data = await repository.update(
         userModel,
         { _id: req.params.id },
-        body
+        body,
+        transaction
       );
-
+      await transaction.commit();
       return res.status(200).json(helper.SuccessMessage(data));
     } else {
       return res
-        .status(200)
-        .json(helper.error_message(helper.statusMessages.parameter_Missing));
+      .status(200)
+      .json(helper.error_message(helper.statusMessages.parameter_Missing));
     }
   } catch (error) {
+    await transaction.rollback();
     return res.status(200).json(helper.errorMessage(error));
   }
 };
