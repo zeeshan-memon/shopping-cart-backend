@@ -1,5 +1,5 @@
 const helper = require("../helper/helper");
-const sequelize = require("../configs/sequelize").sequelize;
+const sequelize = require("../configs/sequelize");
 
 module.exports.get = async (
   model,

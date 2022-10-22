@@ -1,7 +1,6 @@
 'use strict'
 const Sequelize = require('sequelize');
-
-const sequelize = new Sequelize(process.env.DB_URI, {
+const sequelize = new Sequelize(process.env.SQL_DB_URI, {
     define: {
         underscored: false,
         charset: 'utf8',

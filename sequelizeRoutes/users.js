@@ -12,5 +12,5 @@ module.exports = (router, tokenValidation, decodeBody) => {
     .put(accountUpdateValidations, tokenValidation, decodeBody, controller.update)
     .delete(tokenValidation, decodeBody, controller.delete);
 
-  router.post("/login", loginValidations, Controller.login);  
+  router.post("/login", loginValidations, controller.login);  
 };
