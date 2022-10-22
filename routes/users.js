@@ -2,6 +2,7 @@ const controller = require("../controllers/users");
 const {
   accountValidations,
   accountUpdateValidations,
+  loginValidations
 } = require("../helper/middleware");
 module.exports = (router, tokenValidation, decodeBody) => {
   router
@@ -10,4 +11,6 @@ module.exports = (router, tokenValidation, decodeBody) => {
     .post(accountValidations, decodeBody, controller.create)
     .put(accountUpdateValidations, tokenValidation, decodeBody, controller.update)
     .delete(tokenValidation, decodeBody, controller.delete);
+  
+  router.post("/login", loginValidations, controller.login);
 };

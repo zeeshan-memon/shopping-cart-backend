@@ -47,6 +47,17 @@ module.exports = {
   delete: (req, res) => {
     fnDeleteUser(req, res);
   },
+
+  /**
+   * ===================================================================================================================
+   * Request for login to the system from web that means users with role not equal to karry can use this request to login.
+   * ===================================================================================================================
+   */
+
+  login: (req, res) => {
+    fnLogin(req, res);
+  },
+  
 };
 
 const fnCreateUser = async (req, res) => {
@@ -179,7 +190,7 @@ const fnDeleteUser = async (req, res) => {
       let query = {
         _id: req.params.id,
       };
-      let user = await repository.count(
+      let user = await repository.get(
         userModel,
         query,
         true,
@@ -192,7 +203,7 @@ const fnDeleteUser = async (req, res) => {
       );
 
       if (!user) {
-        return res.status(200).json(helper.errorMessage("UserX Not Found"));
+        return res.status(200).json(helper.errorMessage("User Not Found"));
       }
 
       let data = await repository.update(
@@ -206,6 +217,73 @@ const fnDeleteUser = async (req, res) => {
       return res
         .status(200)
         .json(helper.error_message(helper.statusMessages.parameter_Missing));
+    }
+  } catch (error) {
+    return res.status(200).json(helper.errorMessage(error));
+  }
+};
+
+const fnLogin = async (req, res) => {
+  try {
+    let body = req.body;
+    //Error catch for the Express Validator
+    const errors = await validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(200).json(helper.errorMessage(errors.array()[0]));
+    }
+
+    let query = {
+      email: body.email.toLowerCase(),
+    };
+
+    const user = await repository.get(
+      userModel,
+      query,
+      true,
+      "_id isAdmin userName email password"
+    );
+    if (!user) {
+      return res
+        .status(200)
+        .json(helper.errorMessage(helper.statusMessages.account_not_found));
+    } else if (user) {
+      bcrypt.compare(body.password, user.password, (err, result) => {
+        if (result) {
+          let data = {
+            _id: user._id,
+            email: user.email,
+          };
+          let temp = {};
+
+          jwt.sign(
+            data,
+            process.env.secret,
+            // {
+            //   expiresIn: process.env.expirytime,
+            // },
+            async (error, token) => {
+              if (error)
+                return res.status(200).json(helper.errorMessage(error));
+              temp.isAdmin = user.isAdmin;
+              temp.userName = user.userName;
+              temp.token = token;
+              temp.email = user.email;
+
+              if (helper.toBoolean(process.env.IsMONIT))
+                return res.status(200).json(helper.SuccessMessage(temp));
+            }
+          );
+        } else {
+          if (helper.toBoolean(process.env.IsMONIT))
+            return res
+              .status(200)
+              .json(
+                helper.errorMessage(
+                  helper.statusMessages.incorrect_user_password
+                )
+              );
+        }
+      });
     }
   } catch (error) {
     return res.status(200).json(helper.errorMessage(error));

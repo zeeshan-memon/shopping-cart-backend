@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const helper = require("./helper");
-const { check } = require('express-validator');
+const { check } = require("express-validator");
 
 exports.tokenValidation = (req, res, next) => {
   if (process.env.NODE_ENV === "test" || process.env.NODE_ENV === "local") {
@@ -112,5 +112,27 @@ exports.accountUpdateValidations = async (req, res, next) => {
       .withMessage("Name only accept Characters")
       .run(req);
   }
+  next();
+};
+
+/**
+ * ===================================================================================================================
+ * Middleware to validate email and password.
+ * ===================================================================================================================
+ */
+
+exports.loginValidations = async (req, res, next) => {
+  await check("email")
+    .exists()
+    .withMessage(helper.statusMessages.fields_missing)
+    .isEmail()
+    .withMessage("You have provided an Invalid")
+    .run(req);
+
+  await check("password")
+    .exists()
+    .withMessage(helper.statusMessages.fields_missing)
+    .run(req);
+
   next();
 };
