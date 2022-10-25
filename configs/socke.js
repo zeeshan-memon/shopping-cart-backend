@@ -28,7 +28,7 @@ module.exports.init = (io) => {
   io.on("connection", async (socket) => {
       try {
         console.log("socket.request.session", socket.request.session);
-        ocket.join(socket.request.session._id.toString())
+        socket.join(socket.request.session._id.toString())
       } catch (e) {
         console.log("ERROR in ", "socket connect", e);
       }

@@ -5,21 +5,21 @@
   "main": "app.js",
   "scripts": {
     "local": "cross-env NODE_ENV=local nodemon app.js",
-    "dev": "cross-env NODE_ENV=dev pm2 start app.js --name 'ZamBazzar'",
-    "stag": "cross-env NODE_ENV=staging pm2 start app.js --name 'ZamBazzar'",
-    "prod": "cross-env NODE_ENV=prod pm2 start app.js --name 'ZamBazzar'",
+    "dev": "cross-env NODE_ENV=dev pm2 start app.js --name 'abc'",
+    "stag": "cross-env NODE_ENV=staging pm2 start app.js --name 'abc'",
+    "prod": "cross-env NODE_ENV=prod pm2 start app.js --name 'abc'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zeeshan-memon/zamshopbackend.git"
+    "url": "git+http://services.ignitelabs.co:7990/scm/nst/nodejs-monolithic-architecture-template.git"
   },
   "author": "Zeeshan Ahmed",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/zeeshan-memon/zamshopbackend/issues"
+    "url": "http://services.ignitelabs.co:7990/scm/nst/nodejs-monolithic-architecture-template/issues"
   },
-  "homepage": "https://github.com/zeeshan-memon/zamshopbackend#readme",
+  "homepage": "http://services.ignitelabs.co:7990/scm/nst/nodejs-monolithic-architecture-template#readme",
   "dependencies": {
     "@socket.io/redis-adapter": "^7.2.0",
     "apidoc": "^0.51.1",
