@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const AutoIncrement = require('mongoose-sequence')(mongoose);
-
 const userSchema = new mongoose.Schema(
   {
     userName: { type: String, required: true, unique: true },
@@ -14,7 +13,6 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 userSchema.plugin(AutoIncrement, { id: 'user', inc_field: 'sequence' });
 // generating a hash
 userSchema.methods.generateHash = (password) => {
