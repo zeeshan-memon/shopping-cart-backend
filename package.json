@@ -1,7 +1,7 @@
 {
-  "name": "nodejs-monolithic-architecture-template",
+  "name": "shopping-cart-backend",
   "version": "1.0.0",
-  "description": "This is template project for next projects.",
+  "description": "",
   "main": "app.js",
   "scripts": {
     "local": "cross-env NODE_ENV=local nodemon app.js",
@@ -12,42 +12,28 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+http://services.ignitelabs.co:7990/scm/nst/nodejs-monolithic-architecture-template.git"
+    "url": "git+https://github.com/zeeshan-memon/shopping-cart-backend.git"
   },
   "author": "Zeeshan Ahmed",
   "license": "ISC",
   "bugs": {
-    "url": "http://services.ignitelabs.co:7990/scm/nst/nodejs-monolithic-architecture-template/issues"
+    "url": "https://github.com/zeeshan-memon/shopping-cart-backend.git/issues"
   },
-  "homepage": "http://services.ignitelabs.co:7990/scm/nst/nodejs-monolithic-architecture-template#readme",
+  "homepage": "https://github.com/zeeshan-memon/shopping-cart-backend.git#readme",
   "dependencies": {
-    "@socket.io/redis-adapter": "^7.2.0",
-    "apidoc": "^0.51.1",
-    "axios": "^0.24.0",
-    "bcrypt": "^5.0.1",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
-    "crypto-js": "^4.1.1",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.1",
-    "express-validator": "^6.13.0",
-    "jsonwebtoken": "^8.5.1",
-    "mathjs": "^9.5.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "method-override": "^3.0.0",
-    "moment": "^2.29.1",
-    "mongoose": "^6.6.5",
-    "mongoose-sequence": "^5.3.1",
+    "moment": "^2.30.1",
+    "mongoose": "^8.0.4",
+    "mongoose-sequence": "^6.0.0",
     "morgan": "^1.10.0",
-    "mysql2": "^2.3.3",
-    "node-redis-scan": "^1.3.3",
-    "nodemailer": "^6.6.5",
-    "redis": "^4.1.0",
-    "round-to": "^5.0.0",
-    "sequelize": "^6.3.4",
-    "socket.io": "^4.4.1"
+    "round-to": "^6.0.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
-    "nodemon": "^2.0.20"
+    "nodemon": "^3.0.2"
   }
 }

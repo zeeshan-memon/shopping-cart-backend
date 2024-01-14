@@ -1,10 +1,5 @@
-const cryptoJS = require("crypto-js");
-const nodemailer = require("nodemailer");
-const mongoose = require('mongoose');
-const axios = require('axios');
-const moment = require('moment');
-const roundTo = require('round-to');
-const This =this;
+const mongoose = require("mongoose");
+const moment = require("moment");
 
 exports.errorMessage = (error) => {
   console.log(
@@ -12,80 +7,33 @@ exports.errorMessage = (error) => {
   );
   console.log(error);
   console.log("|======================== ERROR  END  =======================|");
-  if (this.toBoolean(process.env.ENCRYPTION)) {
-    return {
-      data: this.encryptData({
-        status: false,
-        response: null,
-        error: errorMessage(error),
-      }),
-    };
-  } else {
-    return {
-      status: false,
-      response: null,
-      error: errorMessage(error),
-    };
-  }
+  return {
+    status: false,
+    response: null,
+    error: errorMessage(error),
+  };
 };
 
 exports.SuccessMessage = (response) => {
-  if (this.toBoolean(process.env.ENCRYPTION)) {
-    return {
-      data: this.encryptData({
-        status: true,
-        response: response,
-        error: null,
-      }),
-    };
-  } else {
-    return {
-      status: true,
-      response: response,
-      error: null,
-    };
-  }
+  return {
+    status: true,
+    response: response,
+    error: null,
+  };
 };
 
 exports.toBoolean = (text) => {
   return text === "true" ? true : false;
 };
 
-exports.encryptData = (data) => {
-  const key = cryptoJS.enc.Utf8.parse(process.env.ENCRYPTIONKEY);
-  const iv = cryptoJS.enc.Utf8.parse(process.env.ENCRYPTIONIV);
-  return cryptoJS.AES.encrypt(JSON.stringify(data), key, { iv: iv });
-};
 
-exports.decryptData = (data) => {
-  const key = cryptoJS.enc.Utf8.parse(process.env.ENCRYPTIONKEY);
-  const iv = cryptoJS.enc.Utf8.parse(process.env.ENCRYPTIONIV);
-  const bytes = cryptoJS.AES.decrypt(data, key, { iv: iv });
-  return JSON.parse(bytes.toString(cryptoJS.enc.Utf8));
-};
 
 exports.statusMessages = {
-  account_hold: "Your account is on hold.",
+  
   fields_missing: "Required field missing.",
-  already_registered: "Account already registered.",
-  unauthorized_request: "Unauthorized Request.",
-  authentication_failed: "Authentication failed.",
-  incorrect_user_password: "Incorrect user name or password.",
-  incorrect_email_password: "Incorrect email or password.",
   not_found: "No Record Found.",
-  token_not_provided: "No token provided.",
-  password_reset: "Please check you mail.",
-  password_updated: "Password Updated.",
-  incorrect_password: "Incorrect old password.",
-  already_Exist: " already Exist",
   parameter_Missing: "Request Parameter Missing",
-  unable_to_delete: "Unable to delete, already in use somewhere",
   invalid_id: "You have provided an invalid id ",
-  on_hold: "Your account is on hold.",
-  not_approved:
-    "Your profile is not approved. Please contact System Administrator",
-  account_not_found: "Unable to find this account.",
-  orderDetails_Missing: "Please fill order details",
 };
 
 /**
@@ -127,54 +75,6 @@ const errorMessage = (e) => {
 
 /**
  * ===================================================================================================================
- * General Method for getting mail configuration.
- * ===================================================================================================================
- */
-
-let mailConfig = {
-  name: "mail.test.com",
-  host: process.env.SMTP,
-  port: process.env.EMAILPORT,
-  secure: true,
-  auth: {
-    user: process.env.EMAIL,
-    pass: process.env.PASSWORD,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-};
-
-/**
- * ===================================================================================================================
- * General Method for sending email through node mailer.
- * ===================================================================================================================
- */
-
-exports.sendEmail = (obj) => {
-  return new Promise((resolve, reject) => {
-    try {
-      let mail = nodemailer.createTransport(mailConfig);
-      mail.sendMail(
-        {
-          from: `'test'<${process.env.EMAIL}>`,
-          to: obj.Recipients,
-          subject: obj.Subject,
-          html: obj.message,
-          cc: obj.CC,
-        },
-        (err, info) => {
-          return err ? reject(err) : resolve(info);
-        }
-      );
-    } catch (err) {
-      reject(err);
-    }
-  });
-};
-
-/**
- * ===================================================================================================================
  * General Method to convert string to mongoose Object
  * ===================================================================================================================
  */
@@ -185,56 +85,11 @@ exports.toMongooseObjectId = (e) => {
 
 /**
  * ===================================================================================================================
- * General Method to get the response from the axios
- * ===================================================================================================================
- */
-
- exports.axios = (url, httpMethod, headers, data) => {
-  const options = {
-    method: httpMethod,
-    headers: headers,
-    url,
-    data: data
-  };
-
-  return new Promise((resolve, reject) => {
-    axios(options)
-      .then(function (response) {
-          response = response.data
-        if (response.error) {
-          reject(`${response}`)
-        } else {
-          resolve(response);
-        }
-      })
-      .catch(function (error) {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          reject(error.response.data);
-        } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-          // http.ClientRequest in node.js
-          console.log("error.request");
-          console.log(error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log('Error', error.message);
-          reject(error.message);
-        }
-        
-      });
-  });
-};
-
-/**
- * ===================================================================================================================
  * Method to get the start time of the date
  * ===================================================================================================================
  */
 
- exports.startTimeOfDate = (time, date) => {
+exports.startTimeOfDate = (time, date) => {
   if (date) {
     return moment(new Date(date)).startOf(time).toDate();
   } else {
@@ -248,7 +103,7 @@ exports.toMongooseObjectId = (e) => {
  * ===================================================================================================================
  */
 
- exports.endTimeOfDate = (time, date) => {
+exports.endTimeOfDate = (time, date) => {
   if (date) {
     return moment(new Date(date)).endOf(time).toDate();
   } else {
@@ -256,40 +111,10 @@ exports.toMongooseObjectId = (e) => {
   }
 };
 
-/**
- * ===================================================================================================================
- * General Method for round off the decimal value.
- * ===================================================================================================================
- */
-
- exports.round = (value) => {
-  value = parseFloat(value);
-  value = roundTo(value, 4).toFixed(4)
-  return parseFloat(value);
-}
-
-/**
- * ===================================================================================================================
- * General Method for round off the decimal value.
- * ===================================================================================================================
- */
-
-exports.roundWithTwoDecimal = (value) => {
-  value = parseFloat(value);
-  value = roundTo(value, 4)
-  return value.toFixed(2);
-}
-
-/**
- * ===================================================================================================================
- * General Method for fix the decimal value.
- * ===================================================================================================================
- */
-
 exports.fix = (value) => {
-  value = parseFloat(value).toFixed(4)
+  value = parseFloat(value).toFixed(4);
   return value;
-}
+};
 
 /**
  * ===================================================================================================================
@@ -298,7 +123,7 @@ exports.fix = (value) => {
  */
 
 exports.removeMilliseconds = (dt) => {
-  let date = new Date(dt)
-  date.setMilliseconds('000')
+  let date = new Date(dt);
+  date.setMilliseconds("000");
   return date;
-}
+};
